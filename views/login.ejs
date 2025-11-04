@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="hr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Login</title>
+  <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+    <div class="container page">
+        <div class="card">
+            <h2>Broken Authentication demo</h2>
+
+            <p>Primjer radi na način da.. captcha, session dobre poruke za ispis</p>
+
+            <form action="/login" method="post" style="margin-top:12px;">
+                <div class="checkbox-row">
+                    <label for="auth_secure">Uključi sigurnost</label>
+                    <input type="checkbox" name="auth_secure" id="auth_secure">
+                </div>
+                
+                <div class="form-row">
+                    <label for="username">Username</label>
+                    <input class="input" id="username" name="username" type="text" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="password">Password</label>
+                    <input class="input" id="password" name="password" type="password" required>
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top:12px;">
+                    <button class="btn" type="submit">Log In</button>
+                    <a href="/" ><button type="button" class="btn secondary">Natrag</button></a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="hr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>SQL Injection</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+    <div class="container page">
+        <div class="card">
+            <h2>SQL Injection</h2>
+            <p class="helper">Primjer radi na naćin da se pretražuje baza korisnik nakon što upišete pojam 
+                za pretraživanje. Kako bi se pristupilo secure načinu rada, potrebno je izabrati opciju 
+                "Uključi sigurnost". Ako se upit izvršava u vulnerable opciji, zapis ne ide kroz nikakve 
+                provjere i direktno (bez parametrizacije) ide u upit za bazu. Dok u obrnutom slučaju se 
+                provjerava što je upisano i ograničeno je na brojeve, slova i crticu, te se upis 
+                parametrizira pri upitu prema bazi.</p>
+
+            <form action="/sql" method="post" style="margin-top:12px;">
+                <div class="form-row">
+                    <label for="sql_secure">Uključi sigurnost</label>
+                    <div class="checkbox-row">
+                        <input type="checkbox" name="sql_secure" id="sql_secure">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="sql_input">SQL input</label>
+                    <input class="input" type="text" id="sql_input" name="sql_input" placeholder="Unesite korisničko ime..." required >
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top:10px;">
+                    <button class="btn" type="submit">Unesi</button>
+                    <a href="/" ><button type="button" class="btn secondary">Natrag</button></a>
+                </div>
+            </form>
+
+        <% if (typeof executedQuery !== 'undefined') { %>
+            <div class="result">
+                <p><strong>Mode:</strong> <%= secureMode ? 'SECURE' : 'VULNERABLE' %></p>
+                <p><strong>Input:</strong> <%= sqlInput %></p>
+                <h4>Izvršeni SQL:</h4>
+                <pre><%= executedQuery %></pre>
+
+                <% if (rows && rows.length) { %>
+                    <table>
+                    <thead><tr><th>id</th><th>username</th></tr></thead>
+                    <tbody>
+                        <% rows.forEach(r => { %>
+                        <tr><td><%= r.id %></td><td><%= r.username %></td></tr>
+                        <% }) %>
+                    </tbody>
+                    </table>
+                <% } else { %>
+                    <p class="helper">Nema rezultata.</p>
+                <% } %>
+            </div>
+        <% } %>
+        </div>
+    </div>
+</body>
+</html>
