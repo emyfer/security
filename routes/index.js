@@ -19,8 +19,6 @@ router.get("/", (req,res) => {
 })
 
 
-
-
 router.get("/login", (req, res) => {
     res.render('login')
 })
@@ -28,52 +26,60 @@ router.get("/login", (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const username = (req.body.username).trim();
-    const password = req.body.password;
-    const authSecure = !!req.body.auth_secure; 
+    const username = (req.body.username).trim()
+    const password = req.body.password
+    const authSecure = !!req.body.auth_secure 
 
     if (authSecure) {
 
-        const captchaResponse = req.body["g-recaptcha-response"];
-        const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+        const captchaResponse = req.body["g-recaptcha-response"]
+        const secretKey = process.env.RECAPTCHA_SECRET_KEY
 
         const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captchaResponse}`;
 
-        const response = await fetch(verifyUrl, { method: "POST" });
-        const data = await response.json();
+        const response = await fetch(verifyUrl, { method: "POST" })
+        const data = await response.json()
 
         if (!data.success) {
-            return res.render("login", { error: "Captcha verifikacija nije uspjela." });
+            return res.render("login", { error: "Captcha verifikacija nije uspjela." })
         }
+
+        req.session.cookie.maxAge = 15 * 60 * 1000
+        req.session.cookie.httpOnly = true
+    } else {
+        req.session.cookie.httpOnly = false
     }
 
-    const q = 'SELECT id, username, password FROM users WHERE username = $1';
-    const result = await con.query(q, [username]);
+    const q = 'SELECT id, username, password FROM users WHERE username = $1'
+    const result = await con.query(q, [username])
 
     if (result.rows.length === 0) {
-      const errMsg = authSecure ? 'Nešto je krivo.' : 'Korisničko ime nije pronađeno.';
-      return res.render('login', { error: errMsg, username });
+      const errMsg = authSecure ? 'Nešto je krivo.' : 'Korisničko ime nije pronađeno.'
+      return res.render('login', { error: errMsg, username })
     }
     console.log(result.rows)
-    const user = result.rows[0];
+    const user = result.rows[0]
 
     let passwordMatches = false;
-    passwordMatches = (password === user.password);
+    passwordMatches = (password === user.password)
 
 
     if (!passwordMatches) {
-      const errMsg = authSecure ? 'Nešto je krivo.' : 'Lozinka je kriva.';
-      return res.render('login', { error: errMsg, username });
+      const errMsg = authSecure ? 'Nešto je krivo.' : 'Lozinka je kriva.'
+      return res.render('login', { error: errMsg, username })
     }
 
-
-    req.session.user = { id: user.id, username: user.username };
-    return res.render('loggedin', { user: req.session.user });
+    req.session.user = { id: user.id, username: user.username }
+    return res.render('loggedin', { 
+        user: req.session.user,
+        cookie_time: req.session.cookie.maxAge / 60000 + "minuta",
+        cookie_httponly: req.session.cookie.httpOnly
+    })
 
 
   } catch (err) {
-    console.error('Login error:', err);
-    return res.status(500).render('login', { error: 'Došlo je do pogreške. Pokušajte kasnije.', username: (req.body.username || '') });
+    console.error('Login error:', err)
+    return res.status(500).render('login', { error: 'Došlo je do pogreške. Pokušajte kasnije.', username: (req.body.username || '') })
   }
 });
 
@@ -84,18 +90,18 @@ router.get("/sql", (req, res) => {
 })
 
 function isValidIdentifier(str) {
-  if (typeof str !== 'string') return false;
-  const re = /^[a-zA-Z0-9_-]+$/;
-  return re.test(str) && str.length >= 1 && str.length <= 50;
+  if (typeof str !== 'string') return false
+  const re = /^[a-zA-Z0-9_-]+$/
+  return re.test(str) && str.length >= 1 && str.length <= 50
 }
 
 router.post('/sql', async (req, res) => {
   try {
-    const sqlInput = req.body.sql_input;
-    const secureMode = !!req.body.sql_secure;
+    const sqlInput = req.body.sql_input
+    const secureMode = !!req.body.sql_secure
 
 
-    let executedQuery = '';
+    let executedQuery = ''
     let rows = [];
     if (secureMode) {
 
@@ -110,13 +116,13 @@ router.post('/sql', async (req, res) => {
         }
 
 
-        executedQuery = `SELECT id, username FROM users WHERE username = $1`;
-        const result = await con.query(executedQuery, [sqlInput]);
-        rows = result.rows;
+        executedQuery = `SELECT id, username FROM users WHERE username = $1`
+        const result = await con.query(executedQuery, [sqlInput])
+        rows = result.rows
     } else {
-        executedQuery = `SELECT id, username FROM users WHERE username = '${sqlInput}'`;
-        const result = await con.query(executedQuery);
-        rows = result.rows;
+        executedQuery = `SELECT id, username FROM users WHERE username = '${sqlInput}'`
+        const result = await con.query(executedQuery)
+        rows = result.rows
     }
 
     res.render('sql', {
@@ -125,10 +131,10 @@ router.post('/sql', async (req, res) => {
       executedQuery,
       rows,
       error: undefined
-    });
+    })
   } catch (err) {
-    console.error('Error in /sql:', err);
-    res.status(500).send('Server error: ' + err.message);
+    console.error('Error in /sql:', err)
+    res.status(500).send('Server error: ' + err.message)
   }
 });
 

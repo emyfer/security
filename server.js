@@ -8,7 +8,11 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 15 * 60 * 1000 } // 1h
+  cookie: {
+    httpOnly: false, 
+    secure: false, 
+    maxAge: 60 * 60 * 1000 
+  }
 }));
 
 app.set('views', path.join(__dirname, 'views'));
