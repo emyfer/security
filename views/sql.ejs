@@ -36,6 +36,10 @@
                 </div>
             </form>
 
+            <% if(typeof error !== 'undefined') { %>
+                <%= error %>
+            <% } %>
+
         <% if (typeof executedQuery !== 'undefined') { %>
             <div class="result">
                 <p><strong>Mode:</strong> <%= secureMode ? 'SECURE' : 'VULNERABLE' %></p>
