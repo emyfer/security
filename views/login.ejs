@@ -13,7 +13,13 @@
         <div class="card">
             <h2>Broken Authentication</h2>
 
-            <p>Primjer radi na način da.. captcha, session dobre poruke za ispis</p>
+            <p>Primjer radi na način da ako se izabere "Uključi sigurnost" pri prijavi se pojavljuje i Googlov reCaptcha "Im not a robot" checkbox
+                kako bi se spriječili automatizirani napadi, ukoliko neki parametar(username ili lozinka) nisu tocni ispise se poruka "nešto je krivo". 
+                Nakon uspješne prijave stvara se session, a cookie traje max 15 minuta i htttponly zastavica je postavljena na secure (takoder ce biti sessionid 
+                ispisan nakon prijave radi demonstracije). Te se nakon logouta session u potpunosti uklanja i vise nije moguce pristupiti loggedin stranici.
+                Obrnuti slučaj vrijedi kada nije ukljucena sigurnost: nema recaptche, poruke su tipa lozinka je kriva ili username je krivi. Session traje sat vremena
+                te je httponly iskljucen. Log out ne brise sjednicu i moze se opet pristupiti loggedin stranici.
+            </p>
 
             <form action="/login" method="post" style="margin-top:12px;">
                 <div class="checkbox-row" style="margin-bottom: 10px;">

@@ -19,10 +19,11 @@ router.get("/", (req,res) => {
 })
 
 
+
+
 router.get("/login", (req, res) => {
     res.render('login')
 })
-
 
 router.post("/login", async (req, res) => {
   try {
@@ -47,6 +48,7 @@ router.post("/login", async (req, res) => {
         req.session.cookie.maxAge = 15 * 60 * 1000
         req.session.cookie.httpOnly = true
     } else {
+        req.session.cookie.maxAge = 60 * 60 * 1000;
         req.session.cookie.httpOnly = false
     }
 
@@ -57,31 +59,57 @@ router.post("/login", async (req, res) => {
       const errMsg = authSecure ? 'Nešto je krivo.' : 'Korisničko ime nije pronađeno.'
       return res.render('login', { error: errMsg, username })
     }
-    console.log(result.rows)
     const user = result.rows[0]
 
-    let passwordMatches = false;
-    passwordMatches = (password === user.password)
-
-
-    if (!passwordMatches) {
+    if (password !== user.password) {
       const errMsg = authSecure ? 'Nešto je krivo.' : 'Lozinka je kriva.'
       return res.render('login', { error: errMsg, username })
     }
 
-    req.session.user = { id: user.id, username: user.username }
-    return res.render('loggedin', { 
-        user: req.session.user,
-        cookie_time: req.session.cookie.maxAge / 60000 + "minuta",
-        cookie_httponly: req.session.cookie.httpOnly
-    })
-
+    req.session.user = { id: user.id, username: user.username, secureMode: authSecure };
+    res.redirect("loggedin")
+        
 
   } catch (err) {
     console.error('Login error:', err)
     return res.status(500).render('login', { error: 'Došlo je do pogreške. Pokušajte kasnije.', username: (req.body.username || '') })
   }
 });
+
+
+router.get("/loggedin", (req, res) => {
+  if (req.session.user) {
+    res.render("loggedin", {
+        user: req.session.user,
+        cookie_time:(req.session.cookie.maxAge / 60000).toFixed(2) + " minuta",
+        cookie_httponly: req.session.cookie.httpOnly,
+        cookie_id: req.session.id
+    });
+  } else {
+    res.send("Nemate pristup stranici");
+  }
+});
+
+router.post("/logout", (req, res) => {
+
+    if (!req.session.user) {
+        return res.redirect("/login");
+    }
+
+    if (req.session.user.secureMode) {
+        req.session.destroy(err => {
+            if (err) {
+                console.error("Logout error:", err);
+                return res.status(500).send("Greška pri odjavi.");
+            }
+            res.clearCookie("connect.sid");
+            return res.redirect("/login");
+            });
+    } else {
+        return res.redirect("/login");
+    }
+});
+
 
 
 

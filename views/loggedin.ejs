@@ -9,20 +9,20 @@
 <body>
     <div class="container page">
         <div class="card">
-            <h2>Uspješno prijavljeni!</h2>
-
+            <h2>Uspješno prijavljeni! <%= user.username %></h2>
+            <%= user.secureMode ? "Uključena sigurnost" : "Isključena sigurnost ⚠️" %>
             <div class="result">
-                <p>Vaša sesija traje 15 minuta, ako želite čekati uživajte u keksiću: cookieID/sessionID</p>
-                <%= user.username %>
-                <%= cookie_time %>
-                <%= cookie_httponly %>
+                <p>Vaša sesija traje <%= cookie_time %>, ako želite čekati uživajte u keksiću: <%= cookie_id %></p>                
+                <p>httpOnly: <%= cookie_httponly %></p>
             </div>
 
             <div style="display:flex; gap:12px; margin-top:12px;">
-                <button class="btn">Log Out</button>
-                <a href="/login" ><button type="button" class="btn secondary">Natrag</button></a>
+                <form action="/logout" method="post">
+                    <button class="btn" type="submit">Log Out</button>
+                </form>
             </div>
         </div>
     </div>
 </body>
 </html>
+
