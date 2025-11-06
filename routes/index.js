@@ -4,14 +4,24 @@ const { Client } = require('pg');
 require("dotenv").config()
 var router = express.Router()
 
-const con = new Client({
+
+    //SQLLLLLLLLLLLLLLLLLLLLL
+/*const con = new Client({
     host: process.env.HOST,
     user: process.env.USER,
     port: process.env.DB_PORT,
     password: process.env.PASSWORD,
     database: process.env.DATABASE,
 })
-con.connect().then(() => console.log("connected"))
+con.connect().then(() => console.log("connected"))*/
+
+const con = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+con.connect().then(() => console.log("connected to Neon"))
+  .catch(err => console.error('Connection error:', err));
 
 router.get("/", (req,res) => {
 
@@ -52,6 +62,7 @@ router.post("/login", async (req, res) => {
         req.session.cookie.httpOnly = false
     }
 
+        //SQLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
     const q = 'SELECT id, username, password FROM users WHERE username = $1'
     const result = await con.query(q, [username])
 
@@ -143,7 +154,7 @@ router.post('/sql', async (req, res) => {
             });
         }
 
-
+    //SQLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
         executedQuery = `SELECT id, username FROM users WHERE username = $1`
         const result = await con.query(executedQuery, [sqlInput])
         rows = result.rows
