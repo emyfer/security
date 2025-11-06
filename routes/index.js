@@ -1,6 +1,6 @@
 const express = require("express")
 const session = require("express-session")
-const { Client } = require('pg');
+const { Pool } = require('pg');
 require("dotenv").config()
 var router = express.Router()
 
@@ -14,12 +14,15 @@ var router = express.Router()
 })
 con.connect().then(() => console.log("connected"))*/
 
-const con = new Client({
+const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
+  idleTimeoutMillis: 30000, // Zatvori idle konekcije nakon 30s
+  connectionTimeoutMillis: 5000, // Timeout za spoj
+  max: 20
 });
 
-con.connect().then(() => console.log("connected to Neon"))
+pool.connect().then(() => console.log("connected to Neon"))
   .catch(err => console.error('Connection error:', err));
 
 router.get("/", (req,res) => {
@@ -61,7 +64,7 @@ router.post("/login", async (req, res) => {
     }
 
     const q = 'SELECT id, username, password FROM users WHERE username = $1'
-    const result = await con.query(q, [username])
+    const result = await pool.query(q, [username])
 
     if (result.rows.length === 0) {
       const errMsg = authSecure ? 'Nešto je krivo.' : 'Korisničko ime nije pronađeno.'
@@ -152,11 +155,11 @@ router.post('/sql', async (req, res) => {
         }
 
         executedQuery = `SELECT id, username FROM users WHERE username = $1`
-        const result = await con.query(executedQuery, [sqlInput])
+        const result = await pool.query(executedQuery, [sqlInput])
         rows = result.rows
     } else {
         executedQuery = `SELECT id, username FROM users WHERE username = '${sqlInput}'`
-        const result = await con.query(executedQuery)
+        const result = await pool.query(executedQuery)
         rows = result.rows
     }
 
