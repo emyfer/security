@@ -1,7 +1,7 @@
 const express = require("express")
 const session = require("express-session")
 const app = express();
-const port = 5000
+
 const path = require("path")
 
 app.use(session({
@@ -27,7 +27,11 @@ var indexRouter = require("./routes/index.js")
 app.use("/", indexRouter)
 
 
+const externalUrl = process.env.RENDER_EXTERNAL_URL;
+const port = process.env.PORT || 5000;
+const hostname = externalUrl ? '0.0.0.0' : 'localhost';
 
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+app.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+  if (externalUrl) console.log(`Externally accessible at ${externalUrl}`);
 });

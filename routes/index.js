@@ -5,7 +5,6 @@ require("dotenv").config()
 var router = express.Router()
 
 
-    //SQLLLLLLLLLLLLLLLLLLLLL
 /*const con = new Client({
     host: process.env.HOST,
     user: process.env.USER,
@@ -27,7 +26,6 @@ router.get("/", (req,res) => {
 
     res.render('index')
 })
-
 
 
 
@@ -62,7 +60,6 @@ router.post("/login", async (req, res) => {
         req.session.cookie.httpOnly = false
     }
 
-        //SQLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
     const q = 'SELECT id, username, password FROM users WHERE username = $1'
     const result = await con.query(q, [username])
 
@@ -154,7 +151,6 @@ router.post('/sql', async (req, res) => {
             });
         }
 
-    //SQLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
         executedQuery = `SELECT id, username FROM users WHERE username = $1`
         const result = await con.query(executedQuery, [sqlInput])
         rows = result.rows
