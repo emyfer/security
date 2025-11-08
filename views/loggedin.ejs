@@ -10,7 +10,7 @@
     <div class="container page">
         <div class="card">
             <h2>Uspješno prijavljeni! <%= user.username %></h2>
-            <%= user.secureMode ? "Uključena sigurnost" : "Isključena sigurnost ⚠️" %>
+            <%= user.secureMode ? "Uključena sigurnost" : "Isključena sigurnost " %>
             <div class="result">
                 <p>Vaša sesija traje <%= cookie_time %>, ako želite čekati uživajte u keksiću: <%= cookie_id %></p>                
                 <p>httpOnly: <%= cookie_httponly %></p>
